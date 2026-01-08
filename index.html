@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unlock the Reward</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:Poppins,sans-serif;
+  color:#fff;
+  overflow:hidden;
+  background:
+    linear-gradient(rgba(0,0,0,.7),rgba(0,0,0,.85)),
+    url("bg3.jpg") center/cover no-repeat fixed;
+}
+
+/* MUSIC BUTTON */
+.music-btn{
+  position:fixed;
+  top:16px;
+  right:16px;
+  width:54px;
+  height:54px;
+  border-radius:50%;
+  background:rgba(255,255,255,.12);
+  backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.25);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition:.4s ease;
+  z-index:10;
+}
+.music-btn.active{
+  box-shadow:0 0 30px rgba(212,175,55,.8);
+}
+.music-icon{
+  width:0;height:0;
+  border-left:10px solid #fff;
+  border-top:6px solid transparent;
+  border-bottom:6px solid transparent;
+}
+.music-btn.active .music-icon{
+  width:10px;height:14px;
+  border:none;
+  background:#fff;
+  position:relative;
+}
+.music-btn.active .music-icon:before,
+.music-btn.active .music-icon:after{
+  content:"";
+  position:absolute;
+  width:3px;
+  height:14px;
+  background:#000;
+}
+.music-btn.active .music-icon:before{left:0}
+.music-btn.active .music-icon:after{right:0}
+
+/* CARD */
+.card{
+  width:90%;
+  max-width:420px;
+  padding:38px 28px;
+  border-radius:26px;
+  background:rgba(255,255,255,.07);
+  backdrop-filter:blur(16px);
+  box-shadow:0 30px 80px rgba(0,0,0,.85);
+  text-align:center;
+  animation:fade .6s ease;
+}
+
+@keyframes fade{
+  from{opacity:0; transform:translateY(20px)}
+  to{opacity:1; transform:translateY(0)}
+}
+
+.qno{font-size:.8rem;opacity:.6;margin-bottom:10px;}
+.question{
+  font-family:Playfair Display,serif;
+  font-size:1.45rem;
+  margin-bottom:16px;
+}
+.hint{font-size:.85rem;opacity:.65;margin-bottom:20px;}
+
+input{
+  width:100%;
+  padding:14px;
+  border-radius:12px;
+  border:none;
+  font-size:1rem;
+  margin-bottom:16px;
+}
+
+button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:999px;
+  background:linear-gradient(135deg,#9b5cff,#6f4cff);
+  color:#fff;
+  font-size:1rem;
+  cursor:pointer;
+}
+
+.error{font-size:.8rem;color:#ff7a7a;margin-top:10px}
+
+/* FINAL OFFER */
+.offer h1{
+  font-family:Playfair Display,serif;
+  font-size:1.8rem;
+  margin-bottom:14px;
+}
+.offer p{font-size:.95rem;opacity:.9;line-height:1.6}
+.code{
+  display:inline-block;
+  margin-top:12px;
+  padding:10px 20px;
+  border-radius:999px;
+  background:linear-gradient(135deg,#d4af37,#f6e27a);
+  color:#000;
+  font-weight:600;
+  letter-spacing:1px;
+}
+.confidential{
+  margin-top:20px;
+  font-size:.8rem;
+  opacity:.65;
+  border-top:1px solid rgba(255,255,255,.2);
+  padding-top:12px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- MUSIC -->
+<div class="music-btn" id="musicBtn" onclick="toggleMusic()">
+  <div class="music-icon"></div>
+</div>
+<audio id="music" src="music.mp3" loop></audio>
+
+<!-- MAIN CARD -->
+<div class="card" id="card">
+  <div class="qno" id="qno"></div>
+  <div class="question" id="question"></div>
+  <div class="hint" id="hint"></div>
+
+  <input type="text" id="answer" placeholder="Type your answer">
+  <button onclick="checkAnswer()">Next</button>
+
+  <div class="error" id="error"></div>
+</div>
+
+<script>
+const questions=[
+{q:"What comes once in a minute, twice in a moment?",h:"It’s a letter.",a:"m"},
+{q:"I’m always in front of you, but unseen.",h:"Time related.",a:"future"},
+{q:"The more you take, the more you leave.",h:"You walk with them.",a:"footsteps"},
+{q:"What has a heart but no feelings?",h:"Vegetable.",a:"lettuce"},
+{q:"What does curiosity always lead to?",h:"Think discovery.",a:"discovery"}
+];
+
+let i=0;
+let playing=false;
+
+const qno=document.getElementById("qno");
+const qEl=document.getElementById("question");
+const hEl=document.getElementById("hint");
+const ans=document.getElementById("answer");
+const err=document.getElementById("error");
+const card=document.getElementById("card");
+const music=document.getElementById("music");
+const musicBtn=document.getElementById("musicBtn");
+
+function load(){
+  qno.innerText=`Question ${i+1} of 5`;
+  qEl.innerText=questions[i].q;
+  hEl.innerText="Hint: "+questions[i].h;
+  ans.value="";
+  err.innerText="";
+}
+load();
+
+function checkAnswer(){
+  if(ans.value.trim().toLowerCase()===questions[i].a){
+    i++;
+    if(i<questions.length){
+      card.style.animation="none";
+      setTimeout(()=>{card.style.animation="fade .6s ease";load()},50);
+    }else{
+      showOffer();
+    }
+  }else{
+    err.innerText="Incorrect. Try again 🙂";
+  }
+}
+
+function toggleMusic(){
+  if(!playing){
+    music.play();
+    musicBtn.classList.add("active");
+    playing=true;
+  }else{
+    music.pause();
+    musicBtn.classList.remove("active");
+    playing=false;
+  }
+}
+
+function showOffer(){
+  document.body.innerHTML=`
+    <div class="card offer">
+      <h1>You’ve won 🎉</h1>
+      <p>
+        You have unlocked a<br>
+        <b>₹1299 worth Custom Birthday Website — absolutely FREE.</b><br><br>
+        To claim this offer, please contact the admin — <b>Shashi</b>.
+      </p>
+
+      <div class="code">SHASHI-BDAY-VIP-1299</div>
+
+      <div class="confidential">
+        Important Notice:<br>
+        This claim code is confidential and non-transferable.<br>
+        Please do not share it with anyone.
+      </div>
+
+      <div class="confidential" style="margin-top:14px;">
+        Created by Shashi
+      </div>
+    </div>
+  `;
+}
+</script>
+
+</body>
+</html>
