@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reward Verification</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-family:Poppins,sans-serif;
+  color:#fff;
+  overflow:hidden;
+}
+
+/* Background Video */
+.bg-video{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  z-index:-2;
+}
+.overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.75);
+  z-index:-1;
+}
+
+/* Card */
+.card{
+  width:92%;
+  max-width:480px;
+  padding:36px 28px;
+  border-radius:26px;
+  background:rgba(255,255,255,.08);
+  backdrop-filter:blur(18px);
+  box-shadow:0 40px 120px rgba(0,0,0,.9);
+  text-align:center;
+  animation:fade .6s ease;
+}
+@keyframes fade{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+h1{
+  font-family:Playfair Display,serif;
+  font-size:1.7rem;
+  margin-bottom:10px;
+}
+p{font-size:.95rem;opacity:.9;margin-bottom:12px;}
+
+button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:999px;
+  background:linear-gradient(135deg,#8f6bff,#5a3cff);
+  color:#fff;
+  font-size:1rem;
+  cursor:pointer;
+}
+button:active{transform:scale(.96)}
+
+input{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:12px;
+  margin-bottom:12px;
+  font-size:1rem;
+}
+
+/* Progress */
+.progress{
+  height:10px;
+  background:rgba(255,255,255,.2);
+  border-radius:999px;
+  overflow:hidden;
+  margin-top:14px;
+}
+.bar{
+  height:100%;
+  width:0%;
+  background:linear-gradient(135deg,#6f9cff,#9b5cff);
+  transition:.7s;
+}
+
+/* Timer */
+.timer{
+  font-size:1.8rem;
+  margin:10px 0;
+  color:#ffd26f;
+}
+
+/* Tap */
+.tap-btn{
+  width:150px;
+  height:150px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#ffd26f,#f6b93b);
+  color:#000;
+  font-weight:600;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  margin:16px auto;
+  cursor:pointer;
+  box-shadow:0 0 40px rgba(246,185,59,.8);
+}
+
+/* Code */
+.code{
+  display:inline-block;
+  margin:14px 0;
+  padding:10px 22px;
+  border-radius:999px;
+  background:linear-gradient(135deg,#d4af37,#f6e27a);
+  color:#000;
+  font-weight:600;
+  letter-spacing:1px;
+}
+
+/* WhatsApp */
+.whatsapp{
+  margin-top:14px;
+  background:linear-gradient(135deg,#25D366,#1ebe5d);
+}
+
+/* Insta */
+.insta{
+  margin-top:14px;
+  font-size:1.4rem;
+}
+.insta a{
+  color:#fff;
+  margin:0 8px;
+}
+
+.notice{
+  margin-top:14px;
+  font-size:.75rem;
+  opacity:.7;
+  border-top:1px solid rgba(255,255,255,.25);
+  padding-top:12px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- Background -->
+<video class="bg-video" autoplay muted loop playsinline>
+  <source src="bg.mp4" type="video/mp4">
+</video>
+<div class="overlay"></div>
+
+<div class="card" id="app"></div>
+
+<script>
+const app = document.getElementById("app");
+
+/* STEP 1: Fake Analysis */
+let prog=0;
+const sysMsg=[
+ "Initializing verification...",
+ "Analyzing activity...",
+ "Checking response accuracy...",
+ "Measuring effort level...",
+ "Final system validation..."
+];
+let mi=0;
+
+function systemCheck(){
+  app.innerHTML=`
+    <h1>System Analysis</h1>
+    <p id="status">${sysMsg[0]}</p>
+    <div class="progress"><div class="bar" id="bar"></div></div>
+  `;
+  const bar=document.getElementById("bar");
+  const status=document.getElementById("status");
+
+  let interval=setInterval(()=>{
+    prog+=Math.floor(Math.random()*6)+4;
+    if(prog>100) prog=100;
+    bar.style.width=prog+"%";
+
+    if(prog>=(mi+1)*20 && mi<sysMsg.length-1){
+      mi++;
+      status.innerText=sysMsg[mi];
+    }
+    if(prog>=100){
+      clearInterval(interval);
+      setTimeout(startQuestions,1500);
+    }
+  },900);
+}
+
+/* STEP 2: 10 Questions */
+const questions=[
+ {q:"10 + 15 = ?",a:"25"},
+ {q:"6 × 5 = ?",a:"30"},
+ {q:"40 ÷ 8 = ?",a:"5"},
+ {q:"12 + 18 = ?",a:"30"},
+ {q:"9 × 4 = ?",a:"36"},
+ {q:"50 − 17 = ?",a:"33"},
+ {q:"7 × 6 = ?",a:"42"},
+ {q:"64 ÷ 8 = ?",a:"8"},
+ {q:"14 + 26 = ?",a:"40"},
+ {q:"81 ÷ 9 = ?",a:"9"}
+];
+let qi=0, qTime=12, qTimer;
+
+function startQuestions(){ loadQuestion(); }
+
+function loadQuestion(){
+  qTime=12;
+  app.innerHTML=`
+    <h1>Question ${qi+1}/10</h1>
+    <p>${questions[qi].q}</p>
+    <div class="timer" id="qt">${qTime}</div>
+    <input id="ans" placeholder="Your answer">
+    <button onclick="checkQ()">Submit</button>
+    <p id="msg"></p>
+  `;
+  qTimer=setInterval(()=>{
+    qTime--;
+    document.getElementById("qt").innerText=qTime;
+    if(qTime<=0){
+      clearInterval(qTimer);
+      loadQuestion();
+    }
+  },1000);
+}
+
+function checkQ(){
+  const v=document.getElementById("ans").value.trim();
+  if(v===questions[qi].a){
+    clearInterval(qTimer);
+    qi++;
+    if(qi<questions.length){
+      loadQuestion();
+    }else{
+      startTap();
+    }
+  }else{
+    document.getElementById("msg").innerText="Wrong answer. Try again.";
+  }
+}
+
+/* STEP 3: 500 Taps */
+let taps=0;
+function startTap(){
+  app.innerHTML=`
+    <h1>Final Effort</h1>
+    <p>Tap 500 times to continue</p>
+    <div class="timer" id="tc">${taps} / 500</div>
+    <div class="tap-btn" onclick="tap()">TAP</div>
+  `;
+}
+function tap(){
+  taps++;
+  document.getElementById("tc").innerText = taps + " / 500";
+  if(taps>=500){
+    showReward();
+  }
+}
+
+/* STEP 4: Reward */
+function showReward(){
+  app.innerHTML=`
+    <h1>Access Granted</h1>
+
+    <p><b>₹1299 worth Custom Birthday Website</b><br>
+    — reward unlocked successfully</p>
+
+    <div class="code">BDAY-1299</div>
+
+    <p>
+      ⏳ <b>Validity:</b> Limited to 24 hours only<br>
+      🎟 <b>Availability:</b> Only 3 slots available
+    </p>
+
+    <p>
+      To claim this reward, please contact the admin.<br>
+      <b>A screenshot of this page is mandatory for verification.</b>
+    </p>
+
+    <a href="https://wa.me/916264628191?text=Hello%20Shashi,%0AI%20have%20completed%20all%20steps%20and%20unlocked%20the%20reward.%0AClaim%20Code:%20BDAY-1299%0AI%20am%20sharing%20the%20required%20screenshot."
+       target="_blank">
+      <button class="whatsapp">Tap to Contact Admin</button>
+    </a>
+
+    <div class="insta">
+      <p>Connect on Instagram</p>
+      <a href="https://instagram.com/shash.i575" target="_blank">
+        <i class="fab fa-instagram"></i>
+      </a>
+    </div>
+
+    <div class="notice">
+      This reward is personal and non-transferable.<br>
+      Sharing this code may void access.<br><br>
+      Created by Shashi
+    </div>
+  `;
+}
+
+/* START */
+systemCheck();
+</script>
+
+</body>
+</html>
